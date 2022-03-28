@@ -1,0 +1,11 @@
+--2022-03-24 21:00:47--  https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.go007.com%2F2017%2F05%2F27%2Fe9c5d359ddb032c5_0.jpg
+正在解析主机 gimg2.baidu.com (gimg2.baidu.com)... 182.242.54.36, 240e:c2:1800:78::af06:3524
+正在连接 gimg2.baidu.com (gimg2.baidu.com)|182.242.54.36|:443... 已连接。
+已发出 HTTP 请求，正在等待回应... 200 OK
+长度： 15087 (15K) [image/jpeg]
+正在保存至: “ustc.jpg”
+
+ustc.jpg                                 0%[                                                                          ]       0  --.-KB/s               ustc.jpg                               100%[=========================================================================>]  14.73K  --.-KB/s    用时 0s    
+
+2022-03-24 21:00:48 (408 MB/s) - 已保存 “ustc.jpg” [15087/15087])
+
