@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #ifndef BUFFER_H
 #define BUFFER_H
@@ -13,6 +13,8 @@
 #include<unistd.h> //read() write()
 #include<sys/uio.h> //readv() writev()
 #include<assert.h>
+
+using namespace std;
 
 class Buffer{
 public:
@@ -43,7 +45,7 @@ public:
     void ensureWriteable(size_t len);
     //将数据写入到缓冲区
     void append(const char* str,size_t len);
-    void append(const std::string& str);
+    void append(const string& str);
     void append(const void* data,size_t len);
     void append(const Buffer& buffer);
 
@@ -52,17 +54,17 @@ public:
     ssize_t writeFd(int fd,int* Errno);
 
     //将缓冲区的数据转化为字符串
-    std::string AlltoStr();
+    string AlltoStr();
 
     //test
     void printContent()
     {
-        std::cout<<"pointer location info:"<<readPos_<<" "<<writePos_<<std::endl;
-        for(int i=readPos_;i<=writePos_;++i)
+        cout<<"pointer location info:"<<readPos_<<" "<<writePos_<<endl;
+        for(int i=readPos_; i<= writePos_; ++i)
         {
-            std::cout<<buffer_[i]<<" ";
+            cout<<buffer_[i]<<" ";
         }
-        std::cout<<std::endl;
+        cout<<endl;
     }
 
 private:
@@ -72,9 +74,9 @@ private:
     //用于缓冲区空间不够时的扩容
     void allocateSpace(size_t len);
 
-    std::vector<char>buffer_; //buffer的实体
-    std::atomic<std::size_t>readPos_;//用于指示读指针
-    std::atomic<std::size_t>writePos_;//用于指示写指针
+    vector<char>buffer_; //buffer的实体
+    atomic<size_t>readPos_;//用于指示读指针
+    atomic<size_t>writePos_;//用于指示写指针
 
 };
 

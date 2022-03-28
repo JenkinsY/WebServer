@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #ifndef THREADPOOL_H
 #define THREADPOOL_H

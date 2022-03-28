@@ -1,9 +1,19 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-11
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #include "buffer.h"
+
+using namespace std;
+
+/*
+内存模型：
+begin---------read--------write--------end
+begin-read: prependable
+read-write: readable
+begin-end: writalbe
+*/
 
 Buffer::Buffer(int initBuffersize):buffer_(initBuffersize),readPos_(0),writePos_(0){}
 
@@ -73,7 +83,7 @@ void Buffer::allocateSpace(size_t len)
     else{
         //将读指针置为0,调整一下
         size_t readable=readableBytes();
-        std::copy(BeginPtr_()+readPos_,BeginPtr_()+writePos_,BeginPtr_());
+        copy(BeginPtr_()+readPos_,BeginPtr_()+writePos_,BeginPtr_());
         readPos_=0;
         writePos_=readable;
         assert(readable==readableBytes());
@@ -93,11 +103,11 @@ void Buffer::append(const char* str,size_t len)
 {
     assert(str);
     ensureWriteable(len);
-    std::copy(str,str+len,curWritePtr());
+    copy(str,str+len,curWritePtr());
     updateWritePtr(len);
 }
 
-void Buffer::append(const std::string& str)
+void Buffer::append(const string& str)
 {
     append(str.data(),str.length());
 }
@@ -127,7 +137,7 @@ ssize_t Buffer::readFd(int fd,int* Errno)
     const ssize_t len=readv(fd,iov,2);
     if(len<0)
     {
-        //std::cout<<"从fd读取数据失败！"<<std::endl;
+        //cout<<"从fd读取数据失败！"<<endl;
         *Errno=errno;
     }
     else if(static_cast<size_t>(len)<=writable)
@@ -147,7 +157,7 @@ ssize_t Buffer::writeFd(int fd,int* Errno)
     ssize_t len=write(fd,curReadPtr(),readSize);
     if(len<0)
     {
-        //std::cout<<"往fd写入数据失败！"<<std::endl;
+        //cout<<"往fd写入数据失败！"<<endl;
         *Errno=errno;
         return len;
     }
@@ -155,9 +165,9 @@ ssize_t Buffer::writeFd(int fd,int* Errno)
     return len;
 }
 
-std::string Buffer::AlltoStr()
+string Buffer::AlltoStr()
 {
-    std::string str(curReadPtr(),readableBytes());
+    string str(curReadPtr(),readableBytes());
     initPtr();
     return str;
 }

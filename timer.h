@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #ifndef TIMER_H
 #define TIMER_H
@@ -15,12 +15,13 @@
 #include<memory>
 
 #include "HTTPconnection.h"
+using namespace std;
 
-typedef std::function<void()> TimeoutCallBack;
-typedef std::chrono::high_resolution_clock Clock;
-typedef std::chrono::milliseconds MS;
+typedef function<void()> TimeoutCallBack;
+typedef chrono::high_resolution_clock Clock;
+typedef chrono::milliseconds MS;
 typedef Clock::time_point TimeStamp;
-//typedef std::unique_ptr<HTTPconnection> HTTPconnection_Ptr;
+//typedef unique_ptr<HTTPconnection> HTTPconnection_Ptr;
 
 class TimerNode{
 public:
@@ -36,7 +37,7 @@ public:
 };
 
 class TimerManager{
-    typedef std::shared_ptr<TimerNode> SP_TimerNode;
+    typedef shared_ptr<TimerNode> SP_TimerNode;
 public:
     TimerManager() {heap_.reserve(64);}
     ~TimerManager() {clear();}
@@ -60,8 +61,8 @@ private:
     bool siftdown_(size_t index,size_t n);
     void swapNode_(size_t i,size_t j);
 
-    std::vector<TimerNode>heap_;
-    std::unordered_map<int,size_t>ref_;//映射一个fd对应的定时器在heap_中的位置
+    vector<TimerNode>heap_;
+    unordered_map<int,size_t>ref_;//映射一个fd对应的定时器在heap_中的位置
 };
 
 #endif //TIMER_H

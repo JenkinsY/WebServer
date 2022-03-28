@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #ifndef HTTP_CONNECTION_H
 #define HTTP_CONNECTION_H
@@ -15,6 +15,8 @@
 #include "buffer.h"
 #include "HTTPrequest.h"
 #include "HTTPresponse.h"
+
+using namespace std;
 
 class HTTPconnection{
 public:
@@ -50,7 +52,7 @@ public:
 
     static bool isET;
     static const char* srcDir;
-    static std::atomic<int>userCount;
+    static atomic<int>userCount;
 
 private:
     int fd_;                  //HTTP连接对应的描述符

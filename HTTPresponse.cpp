@@ -1,11 +1,13 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-21
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #include "HTTPresponse.h"
 
-const std::unordered_map<std::string, std::string> HTTPresponse::SUFFIX_TYPE = {
+using namespace std;
+
+const unordered_map<string, string> HTTPresponse::SUFFIX_TYPE = {
     { ".html",  "text/html" },
     { ".xml",   "text/xml" },
     { ".xhtml", "application/xhtml+xml" },
@@ -27,14 +29,14 @@ const std::unordered_map<std::string, std::string> HTTPresponse::SUFFIX_TYPE = {
     { ".js",    "text/javascript "},
 };
 
-const std::unordered_map<int, std::string> HTTPresponse::CODE_STATUS = {
+const unordered_map<int, string> HTTPresponse::CODE_STATUS = {
     { 200, "OK" },
     { 400, "Bad Request" },
     { 403, "Forbidden" },
     { 404, "Not Found" },
 };
 
-const std::unordered_map<int, std::string> HTTPresponse::CODE_PATH = {
+const unordered_map<int, string> HTTPresponse::CODE_PATH = {
     { 400, "/400.html" },
     { 403, "/403.html" },
     { 404, "/404.html" },
@@ -52,7 +54,8 @@ HTTPresponse::~HTTPresponse() {
     unmapFile_();
 }
 
-void HTTPresponse::init(const std::string& srcDir, std::string& path, bool isKeepAlive, int code){
+/* 响应报文初始化： 状态码，长连接，文件路径 */
+void HTTPresponse::init(const string& srcDir, string& path, bool isKeepAlive, int code){
     assert(srcDir != "");
     if(mmFile_) { unmapFile_(); }
     code_ = code;
@@ -63,6 +66,7 @@ void HTTPresponse::init(const std::string& srcDir, std::string& path, bool isKee
     mmFileStat_ = { 0 };
 }
 
+/* 制作响应报文 */
 void HTTPresponse::makeResponse(Buffer& buff) {
     /* 判断请求的资源文件 */
     if(stat((srcDir_ + path_).data(), &mmFileStat_) < 0 || S_ISDIR(mmFileStat_.st_mode)) {
@@ -74,12 +78,17 @@ void HTTPresponse::makeResponse(Buffer& buff) {
     else if(code_ == -1) { 
         code_ = 200; 
     }
+    //如果代码存在，跳转到相应页面，否则跳转到错误页面
     errorHTML_();
+    //添加状态行
     addStateLine_(buff);
+    //添加响应头
     addResponseHeader_(buff);
+    //添加响应体
     addResponseContent_(buff);
 }
 
+/* 获取映射好的文件 */
 char* HTTPresponse::file() {
     return mmFile_;
 }
@@ -88,6 +97,7 @@ size_t HTTPresponse::fileLen() const {
     return mmFileStat_.st_size;
 }
 
+/* 范围内的错误页面 */
 void HTTPresponse::errorHTML_() {
     if(CODE_PATH.count(code_) == 1) {
         path_ = CODE_PATH.find(code_)->second;
@@ -95,8 +105,9 @@ void HTTPresponse::errorHTML_() {
     }
 }
 
+/* 添加状态行 */
 void HTTPresponse::addStateLine_(Buffer& buff) {
-    std::string status;
+    string status;
     if(CODE_STATUS.count(code_) == 1) {
         status = CODE_STATUS.find(code_)->second;
     }
@@ -104,9 +115,10 @@ void HTTPresponse::addStateLine_(Buffer& buff) {
         code_ = 400;
         status = CODE_STATUS.find(400)->second;
     }
-    buff.append("HTTP/1.1 " + std::to_string(code_) + " " + status + "\r\n");
+    buff.append("HTTP/1.1 " + to_string(code_) + " " + status + "\r\n");
 }
 
+//添加响应头
 void HTTPresponse::addResponseHeader_(Buffer& buff) {
     buff.append("Connection: ");
     if(isKeepAlive_) {
@@ -118,6 +130,7 @@ void HTTPresponse::addResponseHeader_(Buffer& buff) {
     buff.append("Content-type: " + getFileType_() + "\r\n");
 }
 
+/* 添加响应体 */
 void HTTPresponse::addResponseContent_(Buffer& buff) {
     int srcFd = open((srcDir_ + path_).data(), O_RDONLY);
     if(srcFd < 0) { 
@@ -134,9 +147,10 @@ void HTTPresponse::addResponseContent_(Buffer& buff) {
     }
     mmFile_ = (char*)mmRet;
     close(srcFd);
-    buff.append("Content-length: " + std::to_string(mmFileStat_.st_size) + "\r\n\r\n");
+    buff.append("Content-length: " + to_string(mmFileStat_.st_size) + "\r\n\r\n");
 }
 
+/* 解除文件映射 */
 void HTTPresponse::unmapFile_() {
     if(mmFile_) {
         munmap(mmFile_, mmFileStat_.st_size);
@@ -144,23 +158,24 @@ void HTTPresponse::unmapFile_() {
     }
 }
 
-std::string HTTPresponse::getFileType_() {
-    /* 判断文件类型 */
-    std::string::size_type idx = path_.find_last_of('.');
-    if(idx == std::string::npos) {
+/* 判断文件类型 */
+string HTTPresponse::getFileType_() {
+    string::size_type idx = path_.find_last_of('.');
+    if(idx == string::npos) {
         return "text/plain";
     }
-    std::string suffix = path_.substr(idx);
+    string suffix = path_.substr(idx);
     if(SUFFIX_TYPE.count(suffix) == 1) {
         return SUFFIX_TYPE.find(suffix)->second;
     }
     return "text/plain";
 }
 
-void HTTPresponse::errorContent(Buffer& buff, std::string message) 
+/* 范围外错误页面 */
+void HTTPresponse::errorContent(Buffer& buff, string message) 
 {
-    std::string body;
-    std::string status;
+    string body;
+    string status;
     body += "<html><title>Error</title>";
     body += "<body bgcolor=\"ffffff\">";
     if(CODE_STATUS.count(code_) == 1) {
@@ -168,10 +183,10 @@ void HTTPresponse::errorContent(Buffer& buff, std::string message)
     } else {
         status = "Bad Request";
     }
-    body += std::to_string(code_) + " : " + status  + "\n";
+    body += to_string(code_) + " : " + status  + "\n";
     body += "<p>" + message + "</p>";
     body += "<hr><em>TinyWebServer</em></body></html>";
 
-    buff.append("Content-length: " + std::to_string(body.size()) + "\r\n\r\n");
+    buff.append("Content-length: " + to_string(body.size()) + "\r\n\r\n");
     buff.append(body);
 }

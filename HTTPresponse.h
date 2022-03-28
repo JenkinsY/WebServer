@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 
 #ifndef HTTP_RESPONSE_H
@@ -16,18 +16,20 @@
 
 #include "buffer.h"
 
+using namespace std;
+
 class HTTPresponse
 {
 public:
     HTTPresponse();
     ~HTTPresponse();
 
-    void init(const std::string& srcDir,std::string& path,bool isKeepAlive=false,int code=-1);
+    void init(const string& srcDir,string& path,bool isKeepAlive=false,int code=-1);
     void makeResponse(Buffer& buffer);
     void unmapFile_();
     char* file();
     size_t fileLen() const;
-    void errorContent(Buffer& buffer,std::string message);
+    void errorContent(Buffer& buffer,string message);
     int code() const {return code_;}
 
 
@@ -37,20 +39,20 @@ private:
     void addResponseContent_(Buffer& buffer);
 
     void errorHTML_();
-    std::string getFileType_();
+    string getFileType_();
 
     int code_;
     bool isKeepAlive_;
 
-    std::string path_;
-    std::string srcDir_;
+    string path_;
+    string srcDir_;
 
     char* mmFile_;
     struct  stat mmFileStat_;
 
-    static const std::unordered_map<std::string, std::string> SUFFIX_TYPE;
-    static const std::unordered_map<int, std::string> CODE_STATUS;
-    static const std::unordered_map<int, std::string> CODE_PATH;
+    static const unordered_map<string, string> SUFFIX_TYPE;
+    static const unordered_map<int, string> CODE_STATUS;
+    static const unordered_map<int, string> CODE_PATH;
     
 };
 

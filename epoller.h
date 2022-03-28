@@ -1,7 +1,7 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-04
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #ifndef EPOLLER_H
 #define EPOLLER_H
@@ -12,6 +12,8 @@
 #include<assert.h>
 #include<vector>
 #include<errno.h>
+
+using namespace std;
 
 class Epoller{
 public:
@@ -34,7 +36,7 @@ public:
 
 private:
     int epollerFd_;//这是标志epoll的描述符
-    std::vector<struct epoll_event>events_; //就绪的事件
+    vector<struct epoll_event>events_; //就绪的事件
 };
 
 #endif //EPOLLER_H

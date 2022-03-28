@@ -1,11 +1,12 @@
 // encode UTF-8
 
-// @Author        : Aged_cat
-// @Date          : 2021-05-11
+// @Author        : JenkinsY
+// @Date          : 2022-03-28
 
 #include "HTTPrequest.h"
+using namespace std;
 
-const std::unordered_set<std::string> HTTPrequest::DEFAULT_HTML{
+const unordered_set<string> HTTPrequest::DEFAULT_HTML{
             "/index", "/welcome", "/video", "/picture"};
 
 void HTTPrequest::init() {
@@ -27,21 +28,21 @@ bool HTTPrequest::parse(Buffer& buff) {
     if(buff.readableBytes() <= 0) {
         return false;
     }
-    //std::cout<<"parse buff start:"<<std::endl;
+    //cout<<"parse buff start:"<<endl;
     //buff.printContent();
-    //std::cout<<"parse buff finish:"<<std::endl;
+    //cout<<"parse buff finish:"<<endl;
     while(buff.readableBytes() && state_ != FINISH) {
-        const char* lineEnd = std::search(buff.curReadPtr(), buff.curWritePtrConst(), CRLF, CRLF + 2);
-        std::string line(buff.curReadPtr(), lineEnd);
+        const char* lineEnd = search(buff.curReadPtr(), buff.curWritePtrConst(), CRLF, CRLF + 2);
+        string line(buff.curReadPtr(), lineEnd);
         switch(state_)
         {
         case REQUEST_LINE:
-            //std::cout<<"REQUEST: "<<line<<std::endl;
+            //cout<<"REQUEST: "<<line<<endl;
             if(!parseRequestLine_(line)) {
                 return false;
             }
             parsePath_();
-            break;    
+            break;
         case HEADERS:
             parseRequestHeader_(line);
             if(buff.readableBytes() <= 2) {
@@ -54,12 +55,13 @@ bool HTTPrequest::parse(Buffer& buff) {
         default:
             break;
         }
-        if(lineEnd == buff.curWritePtr()) { break; }
+        if(lineEnd == buff.curWritePtr())  break;
         buff.updateReadPtrUntilEnd(lineEnd + 2);
     }
     return true;
 }
 
+/* 解析地址 */
 void HTTPrequest::parsePath_() {
     if(path_ == "/") {
         path_ = "/index.html"; 
@@ -74,9 +76,11 @@ void HTTPrequest::parsePath_() {
     }
 }
 
-bool HTTPrequest::parseRequestLine_(const std::string& line) {
-    std::regex patten("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
-    std::smatch subMatch;
+
+/* 解析请求行 */
+bool HTTPrequest::parseRequestLine_(const string& line) {
+    regex patten("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
+    smatch subMatch;
     if(regex_match(line, subMatch, patten)) {   
         method_ = subMatch[1];
         path_ = subMatch[2];
@@ -87,9 +91,10 @@ bool HTTPrequest::parseRequestLine_(const std::string& line) {
     return false;
 }
 
-void HTTPrequest::parseRequestHeader_(const std::string& line) {
-    std::regex patten("^([^:]*): ?(.*)$");
-    std::smatch subMatch;
+/* 解析请求头 */
+void HTTPrequest::parseRequestHeader_(const string& line) {
+    regex patten("^([^:]*): ?(.*)$");
+    smatch subMatch;
     if(regex_match(line, subMatch, patten)) {
         header_[subMatch[1]] = subMatch[2];
     }
@@ -98,7 +103,8 @@ void HTTPrequest::parseRequestHeader_(const std::string& line) {
     }
 }
 
-void HTTPrequest::parseDataBody_(const std::string& line) {
+/* 解析请求消息体，根据消息类型解析内容 */
+void HTTPrequest::parseDataBody_(const string& line) {
     body_ = line;
     parsePost_();
     state_ = FINISH;
@@ -114,7 +120,7 @@ void HTTPrequest::parsePost_() {
     if(method_ == "POST" && header_["Content-Type"] == "application/x-www-form-urlencoded") {
         if(body_.size() == 0) { return; }
 
-        std::string key, value;
+        string key, value;
         int num = 0;
         int n = body_.size();
         int i = 0, j = 0;
@@ -149,25 +155,25 @@ void HTTPrequest::parsePost_() {
             value = body_.substr(j, i - j);
             post_[key] = value;
         }
-    }   
+    }
 }
 
-std::string HTTPrequest::path() const{
+string HTTPrequest::path() const{
     return path_;
 }
 
-std::string& HTTPrequest::path(){
+string& HTTPrequest::path(){
     return path_;
 }
-std::string HTTPrequest::method() const {
+string HTTPrequest::method() const {
     return method_;
 }
 
-std::string HTTPrequest::version() const {
+string HTTPrequest::version() const {
     return version_;
 }
 
-std::string HTTPrequest::getPost(const std::string& key) const {
+string HTTPrequest::getPost(const string& key) const {
     assert(key != "");
     if(post_.count(key) == 1) {
         return post_.find(key)->second;
@@ -175,7 +181,7 @@ std::string HTTPrequest::getPost(const std::string& key) const {
     return "";
 }
 
-std::string HTTPrequest::getPost(const char* key) const {
+string HTTPrequest::getPost(const char* key) const {
     assert(key != nullptr);
     if(post_.count(key) == 1) {
         return post_.find(key)->second;
